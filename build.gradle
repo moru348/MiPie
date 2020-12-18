@@ -1,0 +1,47 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group 'me.moru3.blockin'
+version '1.0-SNAPSHOT'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots" }
+    maven { url "https://repo.moru3.dev/" }
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    compileOnly 'me.moru3:sqlow:2.15.1'
+    compileOnly 'org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task sourceJar(type: Jar) {
+    classifier 'sources'
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        target(MavenPublication) {
+            groupId 'me.moru3'
+            artifactId 'mipie'
+            version 'SNAPSHOT-1.0.1'
+            from components.java
+            artifact tasks.sourceJar
+        }
+    }
+    repositories {
+        maven {
+            url 'repo'
+        }
+    }
+}
