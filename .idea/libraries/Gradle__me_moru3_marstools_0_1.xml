@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: me.moru3:marstools:0.1" type="repository">
+    <properties maven-id="me.moru3:marstools:0.1" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/me/moru3/marstools/0.1/marstools-0.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jetbrains/annotations/16.0.2/annotations-16.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

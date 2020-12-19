@@ -19,9 +19,12 @@ public class Parabola {
     }
 
     public void start(Entity entity) {
+        Location location = start;
         for(double j = -(width/2.0);j<=width/2;j+=0.1) {
-            double y = ph_const*(start.getY() + end.getY()) * j - ph_const*start.getY()*end.getY();
-            entity.teleport(new Location(start.getWorld(), start.getX()+(height/100)/(width/100), start.getY()+y, start.getX()+(width/100)/(height/100)));
+            location = new Location(start.getWorld(), start.getX()+(height/100)/(width/100),
+                    start.getY()+(ph_const*(start.getY() + end.getY()) * j - ph_const*start.getY()*end.getY()),
+                    start.getX()+(width/100)/(height/100));
+            entity.teleport(location);
         }
     }
 }
