@@ -26,14 +26,12 @@ public class Parabola {
         AtomicReference<Location> location = new AtomicReference<>(start);
         AtomicReference<Double> j = new AtomicReference<>(-(width/2.0));
         Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
-            if(j.get()<=width/2) {
-                return;
-            }
+            if(j.get()<=width/2) { return; }
             location.set(new Location(start.getWorld(), start.getX() + (height / 100) / (width / 100),
                     start.getY() + (ph_const * (start.getY() + end.getY()) * j.get() - ph_const * start.getY() * end.getY()),
                     start.getX() + (width / 100) / (height / 100)));
             entity.teleport(location.get());
-            j.updateAndGet(i -> i++);
+            j.updateAndGet(i -> i+=0.1);
         }, 0, 1);
     }
 }
