@@ -34,7 +34,7 @@ public class GuiCreator {
      * @param guiType GuiType
      */
     public GuiCreator(int startX, int startY, int endX, int endY, String name, int rows, GuiType guiType) {
-        if(rows>endY) { throw new IllegalArgumentException("There are not enough rows."); }
+        if(rows<endY) { throw new IllegalArgumentException("There are not enough rows."); }
         inventory = Bukkit.createInventory(null, rows*9, name);
         this.startX = startX;
         this.startY = startY;
