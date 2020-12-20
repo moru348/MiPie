@@ -17,6 +17,8 @@ public class GuiCreator {
     int endX;
     int endY;
 
+    ContentsList<ItemStack> items = new ContentsList<>();
+
     GuiType guiType;
 
     Sound sound;
@@ -71,25 +73,45 @@ public class GuiCreator {
         int nowRow = startY*9 + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
-            if(skip%endX==0) { nowRow += skip; }
+            if(nowRow%endX==0) { nowRow += skip; }
             if(inventory.getItem(nowRow)==null) {
                 inventory.setItem(nowRow, item);
             }
-            skip++;
+            nowRow++;
         }
         return this;
     }
 
-    public GuiCreator addItem(GuiItem item, int x, int y) {
+    public GuiCreator addItem(GuiItem item) {
+        GuiManage.addActionItem(item);
+        items.add(item.getItemStack());
+        return this;
+    }
+
+    public GuiCreator addItem(ItemStack item) {
+        items.add(item);
+        return this;
+    }
+
+    private GuiCreator addItem(GuiItem item, int x, int y) {
         GuiManage.addActionItem(item);
         int nowRow = startY*9 + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
-            if(skip%endX==0) { nowRow += skip; }
-            if(inventory.getItem(nowRow)==null) {
-                inventory.setItem(nowRow, item.getItemStack());
-            }
-            skip++;
+            if(nowRow%endX==0) { nowRow += skip; }
+            inventory.setItem(nowRow, item.getItemStack());
+            nowRow++;
+        }
+        return this;
+    }
+
+    public GuiCreator clear() {
+        int nowRow = startY*9 + startX;
+        int skip = startX+(8-endX)+1;
+        for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
+            if(nowRow%endX==0) { nowRow += skip; }
+            inventory.setItem(nowRow, null);
+            nowRow++;
         }
         return this;
     }
@@ -97,6 +119,17 @@ public class GuiCreator {
     public GuiCreator setOpenSound(Sound sound) {
         this.sound = sound;
         return this;
+    }
+
+    public void open(Player player, int page) {
+        int size = (endY-startY)*(endX-startX);
+        int max = (int) Math.ceil((double) (items.size()-1)/size);
+        if(page<0||page>max) { return; }
+        this.clear();
+        items.slice(page*size, (page*size-1)+size-1).forEach(this::addItem);
+        player.openInventory(inventory);
+        if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
+        this.clear();
     }
 
     public void open(Player player) {

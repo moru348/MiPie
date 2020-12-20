@@ -16,7 +16,7 @@ public class GuiManage implements Listener {
         if(player==null) { return; }
         GuiItem guiItem = actions.get(event.getCurrentItem());
         if(guiItem==null) { return; }
-        guiItem.runAction(player);
+        guiItem.runAction(player, event.getCurrentItem());
     }
 
     public static void addActionItem(GuiItem item) { actions.put(item.getItemStack(), item); }
