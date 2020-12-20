@@ -50,7 +50,7 @@ public class GuiCreator {
         this.endX = endX;
         this.endY = endY;
         this.guiType = guiType;
-        this.size = (endY-startY)*(endX-startX);
+        this.size = (endY-startY)*(endX+1-startX)-1;
     }
 
     /**
@@ -66,7 +66,7 @@ public class GuiCreator {
         endY = rows;
         inventory = Bukkit.createInventory(null, rows*9, name);
         this.guiType = guiType;
-        this.size = (endY-startY)*(endX-startX);
+        this.size = (endY-startY)*(endX+1-startX);
     }
 
     public GuiCreator setItem(ItemStack item, int x, int y) {
@@ -117,7 +117,7 @@ public class GuiCreator {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX+1-startX);i++) {
-            if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip;System.out.println("test: " + skip); }
+            if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip; }
             if(inventory.getItem(nowRow)==null) {
                 inventory.setItem(nowRow, item);
                 return this;
@@ -131,7 +131,7 @@ public class GuiCreator {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX+1-startX);i++) {
-            if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip;System.out.println("test: " + skip); }
+            if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip; }
             inventory.setItem(nowRow, null);
             nowRow++;
         }
@@ -144,30 +144,35 @@ public class GuiCreator {
     }
 
     public void open(Player player, int page) {
-        GuiManage.addActionItem(player, actions);
         if(guiType==GuiType.ONE_MENU) { open(player); return; }
         Pair<Integer, Integer> button = buttons.get(MenuButton.BACK);
         if(page!=0) {
-            this.setItem(new GuiItem(GuiManage.getBackItem()).addConsumer(this::next), button.first(), button.second());
+            this.setItem(new GuiItem(GuiManage.getBackItem()).addConsumer(this::back), button.first(), button.second());
         } else {
-            inventory.setItem(button.second()*9+button.first(), GuiManage.getNoBackItem());
+            this.setItem(new GuiItem(GuiManage.getNoBackItem()), button.first(), button.second());
         }
         Pair<Integer, Integer> button2 = buttons.get(MenuButton.NEXT);
         if(page<max) {
-            inventory.setItem(button2.second()*9+button2.first(), GuiManage.getNextItem());
+            this.setItem(new GuiItem(GuiManage.getNextItem()).addConsumer(this::next), button2.first(), button2.second());
         } else {
-            inventory.setItem(button2.second()*9+button2.first(), GuiManage.getNoNextItem());
+            this.setItem(new GuiItem(GuiManage.getNoNextItem()), button2.first(), button2.second());
         }
+        GuiManage.addActionItem(player, actions);
         now = page;
         if(page<0||page>max) { return; }
         this.clear();
-        items.slice(page*size, (endY-startY)*(endX+1-startX)-1).forEach(this::addItemToInv);
+        items.slice((page-1)*size+page-1, (page-1)*size+size+page-1).forEach(this::addItemToInv);
         player.openInventory(inventory);
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
     public void next(Player player) {
         open(player, now++);
+        this.clear();
+    }
+
+    public void back(Player player) {
+        open(player, now--);
     }
 
     public void open(Player player) {

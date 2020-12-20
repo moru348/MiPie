@@ -4,23 +4,19 @@ import me.moru3.marstools.ContentsMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Arrays;
 import java.util.Collections;
 
-public class GuiManage implements Listener {
+public class GuiManage {
     private static final ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> actions = new ContentsMap<>();
     private static ItemStack next;
     private static ItemStack back;
     private static ItemStack noNext;
     private static ItemStack noBack;
 
-    @EventHandler
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if(player==null) { return; }
