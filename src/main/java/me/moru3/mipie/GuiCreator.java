@@ -22,6 +22,8 @@ public class GuiCreator {
 
     ContentsMap<MenuButton, Pair<Integer, Integer>> buttons = new ContentsMap<>();
 
+    ContentsMap<ItemStack, GuiItem> actions = new ContentsMap<>();
+
     int max;
     int size;
     int now;
@@ -74,7 +76,7 @@ public class GuiCreator {
 
     public GuiCreator setItem(GuiItem item, int x, int y) {
         inventory.setItem(y*9+x, item.getItemStack());
-        GuiManage.addActionItem(item);
+        addActionItem(item);
         return this;
     }
 
@@ -97,7 +99,7 @@ public class GuiCreator {
     }
 
     public GuiCreator addItem(GuiItem item) {
-        GuiManage.addActionItem(item);
+        addActionItem(item);
         max = (int) Math.ceil((double) (items.size()-1)/size);
         items.add(item.getItemStack());
         return this;
@@ -142,10 +144,11 @@ public class GuiCreator {
     }
 
     public void open(Player player, int page) {
+        GuiManage.addActionItem(player, actions);
         if(guiType==GuiType.ONE_MENU) { open(player); return; }
         Pair<Integer, Integer> button = buttons.get(MenuButton.BACK);
         if(page!=0) {
-            inventory.setItem(button.second()*9+button.first(), GuiManage.getBackItem());
+            this.setItem(new GuiItem(GuiManage.getBackItem()).addConsumer(this::next), button.first(), button.second());
         } else {
             inventory.setItem(button.second()*9+button.first(), GuiManage.getNoBackItem());
         }
@@ -163,9 +166,16 @@ public class GuiCreator {
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
+    public void next(Player player) {
+        open(player, now++);
+    }
+
     public void open(Player player) {
+        GuiManage.addActionItem(player, actions);
         if(guiType==GuiType.MULTIPLE_MENU) { open(player, 0); return; }
         player.openInventory(inventory);
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
+
+    public void addActionItem(GuiItem item) { actions.put(item.getItemStack(), item); }
 }

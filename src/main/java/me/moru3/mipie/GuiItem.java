@@ -8,10 +8,13 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class GuiItem {
     ContentsMap<ActionType, Object> actions = new ContentsMap<>();
-    ContentsList<BiConsumer<Player, GuiItem>> consumers = new ContentsList<>();
+    ContentsList<BiConsumer<Player, GuiItem>> biConsumers = new ContentsList<>();
+    ContentsList<Supplier<Void>> suppliers = new ContentsList<>();
+    ContentsList<Consumer<Player>> consumers = new ContentsList<>();
     GuiCreator movePage = null;
 
     private final ItemStack itemStack;
@@ -39,7 +42,17 @@ public class GuiItem {
         return this;
     }
 
-    public GuiItem addConsumer(BiConsumer<Player, GuiItem> consumer) {
+    public GuiItem addBiConsumer(BiConsumer<Player, GuiItem> consumer) {
+        biConsumers.add(consumer);
+        return this;
+    }
+
+    public GuiItem addSupplier(Supplier<Void> supplier) {
+        suppliers.add(supplier);
+        return this;
+    }
+
+    public GuiItem addConsumer(Consumer<Player> consumer) {
         consumers.add(consumer);
         return this;
     }
@@ -55,7 +68,9 @@ public class GuiItem {
             }
         });
         if(movePage!=null) { movePage.open(player); }
-        consumers.forEach(consumer -> consumer.accept(player, GuiManage.getActions().get(item)));
+        biConsumers.forEach(consumer -> consumer.accept(player, GuiManage.getActions().get(player).get(item)));
+        suppliers.forEach(Supplier::get);
+        consumers.forEach(consumer -> consumer.accept(player));
     }
 
     public ItemStack getItemStack() {

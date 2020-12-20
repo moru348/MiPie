@@ -1,6 +1,5 @@
 package me.moru3.mipie;
 
-import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -15,7 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class GuiManage implements Listener {
-    private static final ContentsMap<ItemStack, GuiItem> actions = new ContentsMap<>();
+    private static final ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> actions = new ContentsMap<>();
     private static ItemStack next;
     private static ItemStack back;
     private static ItemStack noNext;
@@ -25,10 +24,13 @@ public class GuiManage implements Listener {
     public void onClick(InventoryClickEvent event) {
         Player player = (Player) event.getWhoClicked();
         if(player==null) { return; }
-        GuiItem guiItem = actions.get(event.getCurrentItem());
+        GuiItem guiItem = actions.get(player).get(event.getCurrentItem());
         if(guiItem==null) { return; }
+        event.isCancelled();
         guiItem.runAction(player, event.getCurrentItem());
     }
+
+    public GuiManage() {}
 
     public static void setNextItem(ItemStack itemStack) { next = itemStack; }
 
@@ -46,7 +48,7 @@ public class GuiManage implements Listener {
             itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "Click to move to the next page"));
             next.setItemMeta(itemMeta);
         }
-        return next;
+        return next.clone();
     }
 
     public static ItemStack getBackItem() {
@@ -57,7 +59,7 @@ public class GuiManage implements Listener {
             itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "Click to return to the previous page."));
             back.setItemMeta(itemMeta);
         }
-        return back;
+        return back.clone();
     }
 
     public static ItemStack getNoNextItem() {
@@ -68,7 +70,7 @@ public class GuiManage implements Listener {
             itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "This page is the final."));
             noNext.setItemMeta(itemMeta);
         }
-        return noNext;
+        return noNext.clone();
     }
 
     public static ItemStack getNoBackItem() {
@@ -79,9 +81,9 @@ public class GuiManage implements Listener {
             itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "This page is the first."));
             noBack.setItemMeta(itemMeta);
         }
-        return noBack;
+        return noBack.clone();
     }
 
-    public static void addActionItem(GuiItem item) { actions.put(item.getItemStack(), item); }
-    public static ContentsMap<ItemStack, GuiItem> getActions() { return actions; }
+    public static void addActionItem(Player player, ContentsMap<ItemStack, GuiItem> action) { actions.put(player, action);}
+    public static ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> getActions() { return actions; }
 }
