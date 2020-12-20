@@ -1,14 +1,25 @@
 package me.moru3.mipie;
 
+import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class GuiManage implements Listener {
-    public static ContentsMap<ItemStack, GuiItem> actions = new ContentsMap<>();
+    private static final ContentsMap<ItemStack, GuiItem> actions = new ContentsMap<>();
+    private static ItemStack next;
+    private static ItemStack back;
+    private static ItemStack noNext;
+    private static ItemStack noBack;
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
@@ -19,5 +30,58 @@ public class GuiManage implements Listener {
         guiItem.runAction(player, event.getCurrentItem());
     }
 
+    public static void setNextItem(ItemStack itemStack) { next = itemStack; }
+
+    public static void setBackItem(ItemStack itemStack) { back = itemStack; }
+
+    public static void setNoNextItem(ItemStack itemStack) { noNext = itemStack; }
+
+    public static void setNoBackItem(ItemStack itemStack) { noBack = itemStack; }
+
+    public static ItemStack getNextItem() {
+        if(next==null) {
+            next = new ItemStack(Material.ARROW);
+            ItemMeta itemMeta = next.getItemMeta();
+            itemMeta.setDisplayName(ChatColor.GREEN + "Next");
+            itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "Click to move to the next page"));
+            next.setItemMeta(itemMeta);
+        }
+        return next;
+    }
+
+    public static ItemStack getBackItem() {
+        if(back==null) {
+            back = new ItemStack(Material.ARROW);
+            ItemMeta itemMeta = back.getItemMeta();
+            itemMeta.setDisplayName(ChatColor.GREEN + "Back");
+            itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "Click to return to the previous page."));
+            back.setItemMeta(itemMeta);
+        }
+        return back;
+    }
+
+    public static ItemStack getNoNextItem() {
+        if(noNext==null) {
+            noNext = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            ItemMeta itemMeta = noNext.getItemMeta();
+            itemMeta.setDisplayName(ChatColor.RED + "Last page");
+            itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "This page is the final."));
+            noNext.setItemMeta(itemMeta);
+        }
+        return noNext;
+    }
+
+    public static ItemStack getNoBackItem() {
+        if(noBack==null) {
+            noBack = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+            ItemMeta itemMeta = noBack.getItemMeta();
+            itemMeta.setDisplayName(ChatColor.RED + "First page");
+            itemMeta.setLore(Collections.singletonList(ChatColor.GRAY + "This page is the first."));
+            noBack.setItemMeta(itemMeta);
+        }
+        return noBack;
+    }
+
     public static void addActionItem(GuiItem item) { actions.put(item.getItemStack(), item); }
+    public static ContentsMap<ItemStack, GuiItem> getActions() { return actions; }
 }

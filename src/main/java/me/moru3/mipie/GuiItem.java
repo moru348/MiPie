@@ -55,7 +55,7 @@ public class GuiItem {
             }
         });
         if(movePage!=null) { movePage.open(player); }
-        consumers.forEach(consumer -> consumer.accept(player, GuiManage.actions.get(item)));
+        consumers.forEach(consumer -> consumer.accept(player, GuiManage.getActions().get(item)));
     }
 
     public ItemStack getItemStack() {

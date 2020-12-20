@@ -2,6 +2,7 @@ package me.moru3.mipie;
 
 import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;
+import me.moru3.marstools.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -19,18 +20,24 @@ public class GuiCreator {
 
     ContentsList<ItemStack> items = new ContentsList<>();
 
+    ContentsMap<MenuButton, Pair<Integer, Integer>> buttons = new ContentsMap<>();
+
+    int max;
+    int size;
+    int now;
+
     GuiType guiType;
 
     Sound sound;
 
     /**
-     * ページメニューを作るときはこっち。
+     * This is when creating a page menu.
      * @param startX startX 0 - 8
      * @param startY startY 0 - 5
      * @param endX endX 0 - 8
      * @param endY endY 0 - 5
-     * @param name %page%を使用すると置き換えられます。
-     * @param rows 行。 0 - 5
+     * @param name Replaced by using %page%.
+     * @param rows line 0 - 5
      * @param guiType GuiType
      */
     public GuiCreator(int startX, int startY, int endX, int endY, String name, int rows, GuiType guiType) {
@@ -41,12 +48,13 @@ public class GuiCreator {
         this.endX = endX;
         this.endY = endY;
         this.guiType = guiType;
+        this.size = (endY-startY)*(endX-startX);
     }
 
     /**
-     * ワンページのみだったらこっち。
-     * @param name %page%を使用すると置き換えられます。
-     * @param rows 行。 0 - 5
+     * If it's only one page, this is it.
+     * @param name Replaced by using %page%.
+     * @param rows line 0 - 5
      * @param guiType GuiType
      */
     public GuiCreator(String name, int rows, GuiType guiType) {
@@ -56,6 +64,7 @@ public class GuiCreator {
         endY = rows;
         inventory = Bukkit.createInventory(null, rows*9, name);
         this.guiType = guiType;
+        this.size = (endY-startY)*(endX-startX);
     }
 
     public GuiCreator setItem(ItemStack item, int x, int y) {
@@ -66,6 +75,11 @@ public class GuiCreator {
     public GuiCreator setItem(GuiItem item, int x, int y) {
         inventory.setItem(y*9+x, item.getItemStack());
         GuiManage.addActionItem(item);
+        return this;
+    }
+
+    public GuiCreator setButton(MenuButton menuButton, int x, int y) {
+        buttons.put(menuButton, new Pair<>(x, y));
         return this;
     }
 
@@ -84,19 +98,23 @@ public class GuiCreator {
 
     public GuiCreator addItem(GuiItem item) {
         GuiManage.addActionItem(item);
+        max = (int) Math.ceil((double) (items.size()-1)/size);
         items.add(item.getItemStack());
         return this;
     }
 
     public GuiCreator addItem(ItemStack item) {
+        max = (int) Math.ceil((double) (items.size()-1)/size);
         items.add(item);
         return this;
     }
 
+
+
     private GuiCreator addItemToInv(ItemStack item) {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
-        for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
+        for(int i = 0;i<(endY-startY)*(endX+1-startX);i++) {
             if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip;System.out.println("test: " + skip); }
             if(inventory.getItem(nowRow)==null) {
                 inventory.setItem(nowRow, item);
@@ -110,7 +128,7 @@ public class GuiCreator {
     public GuiCreator clear() {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
-        for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
+        for(int i = 0;i<(endY-startY)*(endX+1-startX);i++) {
             if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip;System.out.println("test: " + skip); }
             inventory.setItem(nowRow, null);
             nowRow++;
@@ -124,16 +142,29 @@ public class GuiCreator {
     }
 
     public void open(Player player, int page) {
-        int size = (endY-startY)*(endX-startX);
-        int max = (int) Math.ceil((double) (items.size()-1)/size);
+        if(guiType==GuiType.ONE_MENU) { open(player); return; }
+        Pair<Integer, Integer> button = buttons.get(MenuButton.BACK);
+        if(page!=0) {
+            inventory.setItem(button.second()*9+button.first(), GuiManage.getBackItem());
+        } else {
+            inventory.setItem(button.second()*9+button.first(), GuiManage.getNoBackItem());
+        }
+        Pair<Integer, Integer> button2 = buttons.get(MenuButton.NEXT);
+        if(page<max) {
+            inventory.setItem(button2.second()*9+button2.first(), GuiManage.getNextItem());
+        } else {
+            inventory.setItem(button2.second()*9+button2.first(), GuiManage.getNoNextItem());
+        }
+        now = page;
         if(page<0||page>max) { return; }
         this.clear();
-        items.slice(page*size, (page*size-1)+size-1).forEach(this::addItemToInv);
+        items.slice(page*size, (endY-startY)*(endX+1-startX)-1).forEach(this::addItemToInv);
         player.openInventory(inventory);
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
     public void open(Player player) {
+        if(guiType==GuiType.MULTIPLE_MENU) { open(player, 0); return; }
         player.openInventory(inventory);
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
