@@ -97,7 +97,7 @@ public class GuiCreator {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
-            if(((int) Math.ceil(nowRow/9.0))*9+endX==nowRow) { nowRow+=skip; }
+            if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip;System.out.println("test: " + skip); }
             if(inventory.getItem(nowRow)==null) {
                 inventory.setItem(nowRow, item);
                 return this;
@@ -111,7 +111,7 @@ public class GuiCreator {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
-            if(((int) Math.ceil(nowRow/9.0))*9+endX==nowRow) { nowRow+=skip; }
+            if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip;System.out.println("test: " + skip); }
             inventory.setItem(nowRow, null);
             nowRow++;
         }
