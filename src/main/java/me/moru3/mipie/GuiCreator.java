@@ -59,12 +59,12 @@ public class GuiCreator {
     }
 
     public GuiCreator setItem(ItemStack item, int x, int y) {
-        inventory.setItem((y*9-1)+(x-1), item);
+        inventory.setItem(y*9+x, item);
         return this;
     }
 
     public GuiCreator setItem(GuiItem item, int x, int y) {
-        inventory.setItem((y*9-1)+(x-1), item.getItemStack());
+        inventory.setItem(y*9+x, item.getItemStack());
         GuiManage.addActionItem(item);
         return this;
     }
@@ -93,23 +93,25 @@ public class GuiCreator {
         return this;
     }
 
-    private GuiCreator addItem(GuiItem item, int x, int y) {
-        GuiManage.addActionItem(item);
-        int nowRow = startY*9 + startX;
+    private GuiCreator addItemToInv(ItemStack item) {
+        int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
-            if(nowRow%endX==0) { nowRow += skip; }
-            inventory.setItem(nowRow, item.getItemStack());
+            if(((int) Math.ceil(nowRow/9.0))*9+endX==nowRow) { nowRow+=skip; }
+            if(inventory.getItem(nowRow)==null) {
+                inventory.setItem(nowRow, item);
+                return this;
+            }
             nowRow++;
         }
         return this;
     }
 
     public GuiCreator clear() {
-        int nowRow = startY*9 + startX;
-        int skip = startX+(8-endX)+1;
+        int nowRow = (startY*9) + startX;
+        int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX-startX);i++) {
-            if(nowRow%endX==0) { nowRow += skip; }
+            if(((int) Math.ceil(nowRow/9.0))*9+endX==nowRow) { nowRow+=skip; }
             inventory.setItem(nowRow, null);
             nowRow++;
         }
@@ -126,7 +128,7 @@ public class GuiCreator {
         int max = (int) Math.ceil((double) (items.size()-1)/size);
         if(page<0||page>max) { return; }
         this.clear();
-        items.slice(page*size, (page*size-1)+size-1).forEach(this::addItem);
+        items.slice(page*size, (page*size-1)+size-1).forEach(this::addItemToInv);
         player.openInventory(inventory);
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
         this.clear();
