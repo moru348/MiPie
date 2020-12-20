@@ -131,7 +131,6 @@ public class GuiCreator {
         items.slice(page*size, (page*size-1)+size-1).forEach(this::addItemToInv);
         player.openInventory(inventory);
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
-        this.clear();
     }
 
     public void open(Player player) {
