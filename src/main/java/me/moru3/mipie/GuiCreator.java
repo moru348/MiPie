@@ -4,6 +4,7 @@ import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;
 import me.moru3.marstools.Pair;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
