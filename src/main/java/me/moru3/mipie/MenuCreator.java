@@ -158,6 +158,7 @@ public class MenuCreator {
 
     public void open(Player player, int page) {
         if(guiType==MenuType.ONE_MENU) { open(player); return; }
+        now = page;
         MenuManage.addActionItem(player, actions);
         player.openInventory(build(page));
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
