@@ -53,7 +53,7 @@ public class MenuCreator {
         this.guiType = guiType;
         this.size = (endY-startY)*(endX+1-startX)-1;
         this.rows = rows;
-        this.base = Bukkit.createInventory(null, rows, title);
+        this.base = Bukkit.createInventory(null, rows*9, title);
         this.title = title;
         int nowSlot = (startY*9) + startX;
         int skip = startX+(8-endX);
@@ -107,30 +107,30 @@ public class MenuCreator {
     }
 
     private Inventory build() {
-        Inventory result = Bukkit.createInventory(null, rows, title);
+        Inventory result = Bukkit.createInventory(null, rows*9, title);
         result.setContents(base.getContents());
         return result;
     }
 
     private Inventory build(int page) {
         int max = (int) Math.ceil((double) (contents.size()-1)/size);
-        Inventory result = Bukkit.createInventory(null, rows, title);
+        Inventory result = Bukkit.createInventory(null, rows*9, title);
         result.setContents(base.getContents());
         getContents(page).forEach(result::setItem);
         buttons.forEach(button -> {
             switch (button.first()) {
                 case NEXT:
                     if(page<max) {
-                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getNextItem());
+                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getNextItem().clone()).addConsumer(this::next).getItemStack());
                     } else {
-                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getNoNextItem());
+                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getNoNextItem().clone()).getItemStack());
                     }
                     break;
                 case BACK:
                     if(page!=1) {
-                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getBackItem());
+                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getBackItem().clone()).addConsumer(this::back).getItemStack());
                     } else {
-                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getNoBackItem());
+                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getNoBackItem().clone()).getItemStack());
                     }
                     break;
             }
