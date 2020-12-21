@@ -15,7 +15,6 @@ public class GuiItem {
     ContentsList<BiConsumer<Player, GuiItem>> biConsumers = new ContentsList<>();
     ContentsList<Supplier<Void>> suppliers = new ContentsList<>();
     ContentsList<Consumer<Player>> consumers = new ContentsList<>();
-    GuiCreator movePage = null;
 
     private final ItemStack itemStack;
 
@@ -25,11 +24,6 @@ public class GuiItem {
 
     public GuiItem(ItemStack itemStack) {
         this.itemStack = itemStack;
-    }
-
-    public GuiItem addMovePage(GuiCreator page) {
-        movePage = page;
-        return this;
     }
 
     public GuiItem addRunCommand(String cmd) {
@@ -67,8 +61,7 @@ public class GuiItem {
                 Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), cmd.replace("%player%", player.getName()));
             }
         });
-        if(movePage!=null) { movePage.open(player); }
-        biConsumers.forEach(consumer -> consumer.accept(player, GuiManage.getActions().get(player).get(item)));
+        biConsumers.forEach(consumer -> consumer.accept(player, MenuManage.getActions().get(player).get(item)));
         suppliers.forEach(Supplier::get);
         consumers.forEach(consumer -> consumer.accept(player));
     }

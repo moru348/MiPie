@@ -25,7 +25,6 @@ public class MenuCreator {
 
     ContentsMap<ItemStack, GuiItem> actions = new ContentsMap<>();
 
-    int max;
     int size;
     int now;
     int rows;
@@ -33,7 +32,7 @@ public class MenuCreator {
 
     Sound sound;
 
-    GuiType guiType;
+    MenuType guiType;
 
     /**
      * This is when creating a page menu.
@@ -43,9 +42,9 @@ public class MenuCreator {
      * @param endY endY 0 - 5
      * @param title Replaced by using %page%.
      * @param rows line 0 - 5
-     * @param guiType GuiType
+     * @param guiType MenuType
      */
-    public MenuCreator(int startX, int startY, int endX, int endY, String title, int rows, GuiType guiType) {
+    public MenuCreator(int startX, int startY, int endX, int endY, String title, int rows, MenuType guiType) {
         if(rows<endY) { throw new IllegalArgumentException("There are not enough rows."); }
         this.startX = startX;
         this.startY = startY;
@@ -69,9 +68,9 @@ public class MenuCreator {
      * If it's only one page, this is it.
      * @param title Replaced by using %page%.
      * @param rows line 0 - 5
-     * @param guiType GuiType
+     * @param guiType MenuType
      */
-    public MenuCreator(String title, int rows, GuiType guiType) {
+    public MenuCreator(String title, int rows, MenuType guiType) {
         this(0, 0, 8, rows, title, rows, guiType);
     }
     
@@ -121,31 +120,31 @@ public class MenuCreator {
     }
 
     public void open(Player player) {
-        if(guiType==GuiType.MULTIPLE_MENU) { open(player, 0); return; }
-        GuiManage.addActionItem(player, actions);
+        if(guiType==MenuType.MULTIPLE_MENU) { open(player, 0); return; }
+        MenuManage.addActionItem(player, actions);
         player.openInventory(build());
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
     public void open(Player player, int page) {
-        if(guiType==GuiType.ONE_MENU) { open(player); return; }
-        GuiManage.addActionItem(player, actions);
+        if(guiType==MenuType.ONE_MENU) { open(player); return; }
+        MenuManage.addActionItem(player, actions);
         player.openInventory(build(page));
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
     public void open(Player player, int page, Sound sound) {
-        if(guiType==GuiType.ONE_MENU) { open(player); return; }
+        if(guiType==MenuType.ONE_MENU) { open(player); return; }
         this.sound = sound;
-        GuiManage.addActionItem(player, actions);
+        MenuManage.addActionItem(player, actions);
         player.openInventory(build(page));
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
     public void open(Player player, Sound sound) {
-        if(guiType==GuiType.MULTIPLE_MENU) { open(player, 0, sound); return; }
+        if(guiType==MenuType.MULTIPLE_MENU) { open(player, 0, sound); return; }
         this.sound = sound;
-        GuiManage.addActionItem(player, actions);
+        MenuManage.addActionItem(player, actions);
         player.openInventory(build());
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }

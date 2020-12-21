@@ -10,7 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Collections;
 
-public class GuiManage {
+public class MenuManage {
     private static final ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> actions = new ContentsMap<>();
     private static ItemStack next;
     private static ItemStack back;
@@ -26,7 +26,7 @@ public class GuiManage {
         guiItem.runAction(player, event.getCurrentItem());
     }
 
-    public GuiManage() {}
+    public MenuManage() {}
 
     public static void setNextItem(ItemStack itemStack) { next = itemStack; }
 
