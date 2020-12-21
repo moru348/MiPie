@@ -19,9 +19,9 @@ public class MenuCreator {
 
     ContentsList<ItemStack> contents = new ContentsList<>();
 
-    ContentsList<Integer> contentSlot = new ContentsList<>();
+    ContentsList<Pair<MenuButton, Pair<Integer, Integer>>> buttons = new ContentsList<>();
 
-    ContentsMap<MenuButton, Pair<Integer, Integer>> buttons = new ContentsMap<>();
+    ContentsList<Integer> contentSlot = new ContentsList<>();
 
     ContentsMap<ItemStack, GuiItem> actions = new ContentsMap<>();
 
@@ -113,10 +113,35 @@ public class MenuCreator {
     }
 
     private Inventory build(int page) {
+        int max = (int) Math.ceil((double) (contents.size()-1)/size);
         Inventory result = Bukkit.createInventory(null, rows, title);
         result.setContents(base.getContents());
         getContents(page).forEach(result::setItem);
+        buttons.forEach(button -> {
+            switch (button.first()) {
+                case NEXT:
+                    if(page<max) {
+                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getNextItem());
+                    } else {
+                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getNoNextItem());
+                    }
+                    break;
+                case BACK:
+                    if(page!=1) {
+                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getBackItem());
+                    } else {
+                        result.setItem(button.second().second()*9+button.second().first(), MenuManage.getNoBackItem());
+                    }
+                    break;
+            }
+        });
         return result;
+    }
+
+    public MenuCreator setButton(MenuButton menuButton, int x, int y) {
+        Pair<MenuButton, Pair<Integer, Integer>> temp = new Pair<>(menuButton, new Pair<>(x, y));
+        buttons.add(temp);
+        return this;
     }
 
     public void open(Player player) {
@@ -129,6 +154,7 @@ public class MenuCreator {
     public void open(Player player, int page) {
         if(guiType==MenuType.ONE_MENU) { open(player); return; }
         MenuManage.addActionItem(player, actions);
+
         player.openInventory(build(page));
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
@@ -136,17 +162,13 @@ public class MenuCreator {
     public void open(Player player, int page, Sound sound) {
         if(guiType==MenuType.ONE_MENU) { open(player); return; }
         this.sound = sound;
-        MenuManage.addActionItem(player, actions);
-        player.openInventory(build(page));
-        if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
+        open(player, page, sound);
     }
 
     public void open(Player player, Sound sound) {
         if(guiType==MenuType.MULTIPLE_MENU) { open(player, 0, sound); return; }
         this.sound = sound;
-        MenuManage.addActionItem(player, actions);
-        player.openInventory(build());
-        if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
+        open(player);
     }
 
     public void next(Player player) {
