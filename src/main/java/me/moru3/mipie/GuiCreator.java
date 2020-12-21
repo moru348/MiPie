@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.function.ObjIntConsumer;
 
 public class GuiCreator {
@@ -30,6 +31,7 @@ public class GuiCreator {
     int max;
     int size;
     int now;
+    int rows;
 
     GuiType guiType;
 
@@ -54,6 +56,7 @@ public class GuiCreator {
         this.endY = endY;
         this.guiType = guiType;
         this.size = (endY-startY)*(endX+1-startX)-1;
+        this.rows = rows;
     }
 
     /**
@@ -70,6 +73,7 @@ public class GuiCreator {
         inventory = Bukkit.createInventory(null, rows*9, name);
         this.guiType = guiType;
         this.size = (endY-startY)*(endX+1-startX);
+        this.rows = rows;
     }
 
     public GuiCreator setItem(ItemStack item, int x, int y) {
@@ -147,6 +151,10 @@ public class GuiCreator {
         return temp;
     }
 
+    private ItemStack[] getContentsAll() {
+        return inventory.getContents();
+    }
+
     private GuiCreator addItemToInv(ItemStack item) {
         ContentsMap<Integer, ItemStack> contents = this.getContents();
         for(Integer slot:contents.getKeys()) {
@@ -193,7 +201,9 @@ public class GuiCreator {
         if(page<1||page>max) { return; }
         this.clear();
         items.slice((page-1)*size+page-1, (page-1)*size+size+page-1).forEach(this::addItemToInv);
-        player.openInventory(inventory);
+        Inventory result = Bukkit.createInventory(null, rows, inventory.getTitle().replace("%page%", String.valueOf(page)));
+        result.setContents(inventory.getContents());
+        player.openInventory(result);
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
