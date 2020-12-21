@@ -114,7 +114,7 @@ public class MenuCreator {
 
     private Inventory build(int page) {
         int max = (int) Math.ceil((double) (contents.size()-1)/size);
-        Inventory result = Bukkit.createInventory(null, rows*9, title);
+        Inventory result = Bukkit.createInventory(null, rows*9, title.replace("%page%", String.valueOf(page)));
         result.setContents(base.getContents());
         getContents(page).forEach(result::setItem);
         buttons.forEach(button -> {
