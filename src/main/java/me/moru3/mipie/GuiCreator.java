@@ -134,23 +134,24 @@ public class GuiCreator {
         }
     }
 
-    private ContentsMap<ItemStack, Integer> getContents() {
-        ContentsMap<ItemStack, Integer> temp = new ContentsMap<>();
+    private ContentsMap<Integer, ItemStack> getContents() {
+        ContentsMap<Integer, ItemStack> temp = new ContentsMap<>();
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX+1-startX);i++) {
             if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip; }
-            temp.put(inventory.getItem(nowRow), nowRow);
+            temp.put(nowRow, inventory.getItem(nowRow));
             nowRow++;
         }
         return temp;
     }
 
     private GuiCreator addItemToInv(ItemStack item) {
-        ContentsMap<ItemStack, Integer> contents = this.getContents();
-        for(ItemStack temp:contents.getKeys()) {
-            if(temp==null) {
-                this.setItem(temp, contents.get(temp));
+        ContentsMap<Integer, ItemStack> contents = this.getContents();
+        for(Integer slot:contents.getKeys()) {
+            if(contents.get(slot)==null) {
+                this.setItem(item, slot);
+                return this;
             }
         }
         return this;
