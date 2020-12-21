@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.function.ObjIntConsumer;
+
 public class GuiCreator {
 
     Inventory inventory;
@@ -74,6 +76,17 @@ public class GuiCreator {
         return this;
     }
 
+    public GuiCreator setItem(ItemStack item, int slot) {
+        inventory.setItem(slot, item);
+        return this;
+    }
+
+    public GuiCreator setItem(GuiItem item, int slot) {
+        inventory.setItem(slot, item.getItemStack());
+        addActionItem(item);
+        return this;
+    }
+
     public GuiCreator setItem(GuiItem item, int x, int y) {
         inventory.setItem(y*9+x, item.getItemStack());
         addActionItem(item);
@@ -111,16 +124,34 @@ public class GuiCreator {
         return this;
     }
 
-    private GuiCreator addItemToInv(ItemStack item) {
+    private void forEach(ObjIntConsumer<ItemStack> consumer) {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
         for(int i = 0;i<(endY-startY)*(endX+1-startX);i++) {
             if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip; }
-            if(inventory.getItem(nowRow)==null) {
-                inventory.setItem(nowRow, item);
-                return this;
-            }
+            consumer.accept(inventory.getItem(nowRow), nowRow);
             nowRow++;
+        }
+    }
+
+    private ContentsMap<ItemStack, Integer> getContents() {
+        ContentsMap<ItemStack, Integer> temp = new ContentsMap<>();
+        int nowRow = (startY*9) + startX;
+        int skip = startX+(8-endX);
+        for(int i = 0;i<(endY-startY)*(endX+1-startX);i++) {
+            if((((int) Math.ceil(nowRow/9.0))-1)*9+endX+1==nowRow) { nowRow+=skip; }
+            temp.put(inventory.getItem(nowRow), nowRow);
+            nowRow++;
+        }
+        return temp;
+    }
+
+    private GuiCreator addItemToInv(ItemStack item) {
+        ContentsMap<ItemStack, Integer> contents = this.getContents();
+        for(ItemStack temp:contents.getKeys()) {
+            if(temp==null) {
+                this.setItem(temp, contents.get(temp));
+            }
         }
         return this;
     }
