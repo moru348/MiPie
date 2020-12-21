@@ -118,22 +118,27 @@ public class MenuCreator {
         result.setContents(base.getContents());
         getContents(page).forEach(result::setItem);
         buttons.forEach(button -> {
+            GuiItem item;
             switch (button.first()) {
                 case NEXT:
                     if(page<max) {
-                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getNextItem().clone()).addConsumer(this::next).getItemStack());
+                        item = new GuiItem(MenuManage.getNextItem()).addConsumer(this::next);
                     } else {
-                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getNoNextItem().clone()).getItemStack());
+                        item = new GuiItem(MenuManage.getNoNextItem());
                     }
                     break;
                 case BACK:
                     if(page!=1) {
-                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getBackItem().clone()).addConsumer(this::back).getItemStack());
+                        item = new GuiItem(MenuManage.getBackItem()).addConsumer(this::back);
                     } else {
-                        result.setItem(button.second().second()*9+button.second().first(), new GuiItem(MenuManage.getNoBackItem().clone()).getItemStack());
+                        item = new GuiItem(MenuManage.getNoBackItem());
                     }
                     break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + button.first());
             }
+            result.setItem(button.second().second()*9+button.second().first(), item.getItemStack());
+            addActionItem(item);
         });
         return result;
     }
@@ -154,7 +159,6 @@ public class MenuCreator {
     public void open(Player player, int page) {
         if(guiType==MenuType.ONE_MENU) { open(player); return; }
         MenuManage.addActionItem(player, actions);
-
         player.openInventory(build(page));
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
@@ -162,7 +166,7 @@ public class MenuCreator {
     public void open(Player player, int page, Sound sound) {
         if(guiType==MenuType.ONE_MENU) { open(player); return; }
         this.sound = sound;
-        open(player, page, sound);
+        open(player, page);
     }
 
     public void open(Player player, Sound sound) {
