@@ -111,8 +111,6 @@ public class GuiCreator {
         return this;
     }
 
-
-
     private GuiCreator addItemToInv(ItemStack item) {
         int nowRow = (startY*9) + startX;
         int skip = startX+(8-endX);
@@ -146,7 +144,7 @@ public class GuiCreator {
     public void open(Player player, int page) {
         if(guiType==GuiType.ONE_MENU) { open(player); return; }
         Pair<Integer, Integer> button = buttons.get(MenuButton.BACK);
-        if(page!=0) {
+        if(page!=1) {
             this.setItem(new GuiItem(GuiManage.getBackItem()).addConsumer(this::back), button.first(), button.second());
         } else {
             this.setItem(new GuiItem(GuiManage.getNoBackItem()), button.first(), button.second());
@@ -159,7 +157,7 @@ public class GuiCreator {
         }
         GuiManage.addActionItem(player, actions);
         now = page;
-        if(page<0||page>max) { return; }
+        if(page<1||page>max) { return; }
         this.clear();
         items.slice((page-1)*size+page-1, (page-1)*size+size+page-1).forEach(this::addItemToInv);
         player.openInventory(inventory);
@@ -167,12 +165,11 @@ public class GuiCreator {
     }
 
     public void next(Player player) {
-        open(player, now++);
-        this.clear();
+        open(player, ++now);
     }
 
     public void back(Player player) {
-        open(player, now--);
+        open(player, --now);
     }
 
     public void open(Player player) {

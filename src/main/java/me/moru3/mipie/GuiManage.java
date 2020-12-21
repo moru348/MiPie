@@ -22,7 +22,7 @@ public class GuiManage {
         if(player==null) { return; }
         GuiItem guiItem = actions.get(player).get(event.getCurrentItem());
         if(guiItem==null) { return; }
-        event.isCancelled();
+        event.setCancelled(true);
         guiItem.runAction(player, event.getCurrentItem());
     }
 
