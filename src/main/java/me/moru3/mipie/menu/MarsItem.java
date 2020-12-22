@@ -1,4 +1,4 @@
-package me.moru3.mipie;
+package me.moru3.mipie.menu;
 
 import me.moru3.marstools.ContentsList;
 import org.bukkit.inventory.ItemStack;
@@ -18,7 +18,7 @@ public class MarsItem extends ItemStack {
         return this.getItemMeta().getDisplayName();
     }
 
-    public ContentsList<String> getLore() {
+    public List<String> getLore() {
         return (ContentsList<String>) this.getItemMeta().getLore();
     }
 

@@ -1,4 +1,4 @@
-package me.moru3.mipie;
+package me.moru3.mipie.menu;
 
 import me.moru3.marstools.ContentsMap;
 import org.bukkit.ChatColor;
