@@ -4,6 +4,7 @@ import me.moru3.marstools.ContentsList;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
@@ -56,19 +57,20 @@ public class Selector {
                     ContentsList<String> scores = new ContentsList<>(matcher1.group(1).split(","));
                     scores.forEach(score -> {
                         ContentsList<String> boardCond = new ContentsList<>(score.split("="));
+                        Objective objective = board.getObjective(boardCond.get(0));
                         if(SCORE_FIXED.matcher(boardCond.get(0)).matches()) {
-                            temp.forEach(player -> { if(Integer.parseInt(boardCond.get(0))!=board.getObjective(boardCond.get(0)).getScore(player).getScore()) { result.remove(player); } } );
+                            temp.forEach(player -> { if(Integer.parseInt(boardCond.get(0))!=objective.getScore(player).getScore()) { result.remove(player); } } );
                         } else if (SCORE_MAX.matcher(boardCond.get(0)).matches()) {
                             int max = Integer.parseInt(boardCond.get(1).replace("..", ""));
-                            temp.forEach(player -> { if(max<board.getObjective(boardCond.get(0)).getScore(player).getScore()) { result.remove(player); } });
+                            temp.forEach(player -> { if(max<objective.getScore(player).getScore()) { result.remove(player); } });
                         } else if (SCORE_MIN.matcher(boardCond.get(0)).matches()) {
                             int min = Integer.parseInt(boardCond.get(1).replace("..", ""));
-                            temp.forEach(player -> { if(min>board.getObjective(boardCond.get(0)).getScore(player).getScore()) { result.remove(player); } });
+                            temp.forEach(player -> { if(min>objective.getScore(player).getScore()) { result.remove(player); } });
                         } else if (SCORE_RANGE.matcher(boardCond.get(0)).matches()) {
                             ContentsList<String> splitValue = new ContentsList<>(boardCond.get(1).split(".."));
                             int min = Integer.parseInt(splitValue.get(0));
                             int max = Integer.parseInt(splitValue.get(1));
-                            temp.forEach(player -> { if(max<board.getObjective(boardCond.get(0)).getScore(player).getScore()||min>board.getObjective(boardCond.get(0)).getScore(player).getScore()) { result.remove(player); } });
+                            temp.forEach(player -> { if(max<objective.getScore(player).getScore()||min>objective.getScore(player).getScore()) { result.remove(player); } });
                         }
                     });
                     break;
