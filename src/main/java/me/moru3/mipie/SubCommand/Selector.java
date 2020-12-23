@@ -4,7 +4,6 @@ import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -12,6 +11,7 @@ import org.bukkit.scoreboard.ScoreboardManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
@@ -107,7 +107,16 @@ public class Selector {
                     values.forEach(value -> { if(value.startsWith("!")) { notNames.add(value.replaceFirst("!", "")); } else { names.add(value); } });
                     Bukkit.getOnlinePlayers().forEach(player -> { if(!names.contains(player.getName())&&notNames.contains(player.getName())) { result.remove(player); } });
                     break;
-
+                case "tag":
+                    ContentsList<String> tags = new ContentsList<>();
+                    ContentsList<String> notTags = new ContentsList<>();
+                    values.forEach(value -> { if(value.startsWith("!")) { notTags.add(value.replaceFirst("!", "")); } else { tags.add(value); } });
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        AtomicBoolean ok = new AtomicBoolean(tags.size() == 0);
+                        tags.forEach(tag -> { if(player.getScoreboardTags().contains(tag)) { ok.set(true); } });
+                        notTags.forEach(tag -> { if(player.getScoreboardTags().contains(tag)) { ok.set(false); } });
+                        if(!ok.get()) { result.remove(player); }
+                    });
             }
         });
         if(result.size()<=0|| limit.get() <1) { return new ContentsList<>(); }
