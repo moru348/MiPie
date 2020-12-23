@@ -98,25 +98,39 @@ public class Selector {
                 case "gamemode":
                     ContentsList<GameMode> gamemodes = new ContentsList<>();
                     ContentsList<GameMode> notGamemodes = new ContentsList<>();
-                    values.forEach(value -> { for (GameMode gameMode : GameMode.values()) { boolean negation = value.startsWith("!");if (value.equalsIgnoreCase(gameMode.name())) { gamemodes.add(gameMode);break; } else if (value.equalsIgnoreCase("!" + gameMode.name())) { notGamemodes.add(gameMode); }} });
+                    values.forEach(value -> {
+                        for (GameMode gameMode : GameMode.values()) {
+                            if (value.equalsIgnoreCase(gameMode.name())) {
+                                gamemodes.add(gameMode);break;
+                            } else if (value.equalsIgnoreCase("!" + gameMode.name())) {
+                                notGamemodes.add(gameMode);
+                            }
+                        }
+                    });
                     Bukkit.getOnlinePlayers().forEach(player -> { if(!gamemodes.contains(player.getGameMode())&&notGamemodes.contains(player.getGameMode())) { result.remove(player); } });
                     break;
                 case "name":
                     ContentsList<String> names = new ContentsList<>();
                     ContentsList<String> notNames = new ContentsList<>();
                     values.forEach(value -> { if(value.startsWith("!")) { notNames.add(value.replaceFirst("!", "")); } else { names.add(value); } });
-                    Bukkit.getOnlinePlayers().forEach(player -> { if(!names.contains(player.getName())&&notNames.contains(player.getName())) { result.remove(player); } });
+                    Bukkit.getOnlinePlayers().forEach(player -> {
+                        AtomicBoolean ok = new AtomicBoolean(names.size()!=0);
+                        if(names.contains(player.getName())) { ok.set(false); }
+                        if(notNames.contains(player.getName())) { ok.set(true); }
+                        if(ok.get()) { result.remove(player); }
+                    });
                     break;
                 case "tag":
                     ContentsList<String> tags = new ContentsList<>();
                     ContentsList<String> notTags = new ContentsList<>();
                     values.forEach(value -> { if(value.startsWith("!")) { notTags.add(value.replaceFirst("!", "")); } else { tags.add(value); } });
                     Bukkit.getOnlinePlayers().forEach(player -> {
-                        AtomicBoolean ok = new AtomicBoolean(tags.size() == 0);
-                        tags.forEach(tag -> { if(player.getScoreboardTags().contains(tag)) { ok.set(true); } });
-                        notTags.forEach(tag -> { if(player.getScoreboardTags().contains(tag)) { ok.set(false); } });
-                        if(!ok.get()) { result.remove(player); }
+                        AtomicBoolean ok = new AtomicBoolean(false);
+                        tags.forEach(tag -> { if(player.getScoreboardTags().contains(tag)) { ok.set(false); } });
+                        notTags.forEach(tag -> { if(player.getScoreboardTags().contains(tag)) { ok.set(true); } });
+                        if(ok.get()) { result.remove(player); }
                     });
+                    break;
             }
         });
         if(result.size()<=0|| limit.get() <1) { return new ContentsList<>(); }
@@ -163,7 +177,13 @@ public class Selector {
         if(syntax.get().length()<=0) { return new ContentsMap<>(); }
         ContentsList<String> keys = new ContentsList<>(syntax.get().split(","));
         if(keys.size()<=0) { return new ContentsMap<>(); }
-        for (String s : keys) { String[] temp = s.split("="); List<String> tempList = result.get(temp[0]); tempList.add(temp[1]);result.put(temp[0], tempList); }
+        for (String s : keys) {
+            String[] temp = s.split("=");
+            List<String> tempList = new ContentsList<>();
+            if(result.get(temp[0])!=null) { tempList = result.get(temp[0]); }
+            tempList.add(temp[1]);
+            result.put(temp[0], tempList);
+        }
         values.forEach((key, value) -> {
             for (String resultKey : result.getKeys()) {
                 List<String> temp = result.get(resultKey);
