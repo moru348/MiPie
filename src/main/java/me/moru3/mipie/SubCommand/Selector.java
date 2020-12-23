@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@Deprecated
 public class Selector {
     ScoreboardManager manager = Bukkit.getScoreboardManager();
     Scoreboard board = manager.getMainScoreboard();
@@ -29,8 +28,8 @@ public class Selector {
             if(selector.startsWith(selectorType.toString())) { type = selectorType; break; } else { return new ContentsList<>(); }
         }
         Matcher matcher = PROPERTY_REGEX.matcher(selector);
-        if(!matcher.matches()) { return new ContentsList<>(); }
-        ContentsList<String> property = new ContentsList<>(matcher.group(1).split(","));
+        ContentsList<String> property = new ContentsList<>();
+        if(matcher.matches()) { property = new ContentsList<>(matcher.group(1).split(",")); }
         ContentsList<Player> result = new ContentsList<>();
         result.addAll(Bukkit.getOnlinePlayers());
         int limit = Integer.MAX_VALUE;

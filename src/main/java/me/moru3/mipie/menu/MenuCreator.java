@@ -1,4 +1,4 @@
-package me.moru3.mipie.menu;
+package me.moru3.mipie.Menu;
 
 import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;

@@ -1,4 +1,4 @@
-package me.moru3.mipie.menu;
+package me.moru3.mipie.Menu;
 
 public enum ActionType {
     MOVE_PAGE,
