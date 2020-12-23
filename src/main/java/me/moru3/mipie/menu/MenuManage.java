@@ -18,6 +18,7 @@ public class MenuManage {
     private static ItemStack noBack;
 
     public void onClick(InventoryClickEvent event) {
+        if(actions.size()==0) { return; }
         Player player = (Player) event.getWhoClicked();
         if(player==null) { return; }
         GuiItem guiItem = actions.get(player).get(event.getCurrentItem());
