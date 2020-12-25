@@ -41,6 +41,7 @@ public class Selector {
                 return new ContentsList<>();
             }
             ForFunction<Integer, Integer, Integer, Integer, Boolean> coodRange = (Integer v, Integer v2, Integer player, Integer value) -> {
+                System.out.println(v + " : " + v2 + " : " + player + " : " + value);
                 if(v==Integer.MAX_VALUE&&v2==Integer.MAX_VALUE) {
                     return true;
                 } else if(v == Integer.MAX_VALUE) {
@@ -294,21 +295,27 @@ public class Selector {
                     case "x":
                         x.set(Integer.parseInt(values.get(0)));
                         if(x.get()>30000000) { return new ContentsList<>(); }
+                        break;
                     case "y":
                         y.set(Integer.parseInt(values.get(0)));
                         if(y.get()>30000000) { return new ContentsList<>(); }
+                        break;
                     case "z":
                         z.set(Integer.parseInt(values.get(0)));
                         if(z.get()>30000000) { return new ContentsList<>(); }
+                        break;
                     case "dx":
                         dx.set(Integer.parseInt(values.get(0)));
                         if(dx.get()>30000000) { return new ContentsList<>(); }
+                        break;
                     case "dy":
                         dy.set(Integer.parseInt(values.get(0)));
                         if(dy.get()>30000000) { return new ContentsList<>(); }
+                        break;
                     case "dz":
                         dz.set(Integer.parseInt(values.get(0)));
                         if(dz.get()>30000000) { return new ContentsList<>(); }
+                        break;
                     default:
                         return new ContentsList<>();
                 }
