@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 public class MenuCreator {
     Inventory base;
+    Inventory opennedInventory;
 
     int startX;
     int startY;
@@ -62,6 +63,16 @@ public class MenuCreator {
             contentSlot.add(nowSlot);
             nowSlot++;
         }
+    }
+
+    public ItemStack get(int slot) {
+        if(opennedInventory!=null) { return opennedInventory.getItem(slot); }
+        return base.getItem(slot);
+    }
+
+    public ItemStack get(int x, int y) {
+        if(opennedInventory!=null) { return opennedInventory.getItem(y*9+x); }
+        return base.getItem(y*9+x);
     }
 
     /**
@@ -152,7 +163,9 @@ public class MenuCreator {
     public void open(Player player) {
         if(guiType==MenuType.MULTIPLE_MENU) { open(player, 0); return; }
         MenuManage.addActionItem(player, actions);
-        player.openInventory(build());
+        Inventory temp = build();
+        player.openInventory(temp);
+        opennedInventory = temp;
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
@@ -160,7 +173,9 @@ public class MenuCreator {
         if(guiType==MenuType.ONE_MENU) { open(player); return; }
         now = page;
         MenuManage.addActionItem(player, actions);
-        player.openInventory(build(page));
+        Inventory temp = build(page);
+        player.openInventory(temp);
+        opennedInventory = temp;
         if(sound!=null) { player.getWorld().playSound(player.getLocation(), sound, 1F, 1F); }
     }
 
