@@ -18,6 +18,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
     compileOnly 'org.bukkit:bukkit:1.13-pre7-R0.1-SNAPSHOT'
     compileOnly 'me.moru3:marstools:0.21'
+    compileOnly 'me.moru3:sqlow:2.16.2'
 }
 
 test {
