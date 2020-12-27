@@ -104,4 +104,16 @@ public class Gui {
         GuiManager.addGui(this, result, player);
         player.openInventory(result);
     }
+
+    public void open(Player player) {
+        if(sync) {
+            player.openInventory(inventory);
+            GuiManager.addGui(this, inventory, player);
+        } else {
+            Inventory result = Bukkit.createInventory(null, rows*9, title);
+            result.setContents(inventory.getContents());
+            player.openInventory(result);
+            GuiManager.addGui(this, result, player);
+        }
+    }
 }
