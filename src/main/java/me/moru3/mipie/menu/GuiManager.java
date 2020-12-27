@@ -4,13 +4,15 @@ import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
 public class GuiManager {
     private static final ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> actions = new ContentsMap<>();
-    private static final ContentsMap<UUID, ContentsList<Gui>> guiList = new ContentsMap<>();
+    public static final ContentsMap<UUID, ContentsList<Inventory>> guiList = new ContentsMap<>();
+    public static final ContentsMap<Player, UUID> playerGuiList = new ContentsMap<>();
 
     public void onClick(InventoryClickEvent event) {
         if(actions.size()==0) { return; }
@@ -22,10 +24,14 @@ public class GuiManager {
         guiItem.runAction(event);
     }
 
-    public void addGui(Gui gui) {
-        ContentsList<Gui> temp = new ContentsList<>();
+    public static void addGui(Gui gui, Inventory inventory, Player player) {
+        ContentsList<Inventory> temp = new ContentsList<>();
         temp.addAll(guiList.get(gui.getID()));
-        temp.add(gui);
+        temp.add(inventory);
         guiList.put(gui.getID(), temp);
+        playerGuiList.put(player, gui.getID());
+        ContentsMap<ItemStack, GuiItem> temp2 = new ContentsMap<>();
+        gui.actions.forEach(temp2::put);
+        actions.put(player, temp2);
     }
 }

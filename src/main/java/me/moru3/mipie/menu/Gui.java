@@ -30,7 +30,7 @@ public class Gui {
     int rows;
     String title;
 
-    AsyncType asyncType;
+    boolean sync;
 
     Sound sound;
 
@@ -43,7 +43,7 @@ public class Gui {
      * @param title Replaced by using %page%.
      * @param rows line 0 - 5
      */
-    public Gui(int startX, int startY, int endX, int endY, String title, int rows, AsyncType asyncType) {
+    public Gui(int startX, int startY, int endX, int endY, String title, int rows, boolean sync) {
         id = UUID.randomUUID();
         if(rows<endY) { throw new IllegalArgumentException("There are not enough rows."); }
         this.startX = startX;
@@ -56,7 +56,7 @@ public class Gui {
         this.title = title;
         int nowSlot = (startY*9) + startX;
         int skip = startX+(8-endX);
-        this.asyncType = asyncType;
+        this.sync = sync;
         for(int i = 0;i< size+1;i++) {
             if((((int) Math.ceil(nowSlot/9.0))-1)*9+endX+1==nowSlot) { nowSlot+=skip; }
             contentSlot.add(nowSlot);
@@ -85,15 +85,23 @@ public class Gui {
         contentSlot.forEach(i -> inventory.setItem(i, null));
     }
 
-    public Inventory getInventory() { return inventory; }
-
-    public Gui placeContents(int page) {
-        int max = (int) Math.ceil((double) (contents.size()-1)/size);
+    public void open(Player player, int page) {
+        now = page;
         clear();
         Inventory result = Bukkit.createInventory(null, rows*9, title.replace("%page%", String.valueOf(page)));
-        result.setContents(inventory.getContents());
-        getContents(page).forEach(result::setItem);
-        inventory = result;
-        return this;
+        if(sync) {
+            result.setContents(inventory.getContents());
+            getContents(page).forEach(result::setItem);
+            GuiManager.playerGuiList.forEach((plyr, gui) -> {
+                GuiManager.playerGuiList.remove(plyr);
+                plyr.openInventory(result);
+            });
+            inventory = result;
+        } else {
+            new ContentsList<>(inventory.getContents()).forEach((value, index) -> result.setItem(index, value.clone()));
+            getContents(page).forEach((index, value) -> result.setItem(index, value.clone()));
+        }
+        GuiManager.addGui(this, result, player);
+        player.openInventory(result);
     }
 }
