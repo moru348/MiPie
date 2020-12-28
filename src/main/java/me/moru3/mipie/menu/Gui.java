@@ -75,6 +75,18 @@ public class Gui {
         return contentSlot.coalesce(contents.slice((page-1)*size+page-1, (page-1)*size+size+page-1));
     }
 
+    public Gui setItem(GuiItem guiItem, int x, int y) {
+        inventory.setItem(y*9+x, guiItem.getItemStack());
+        actions.put(guiItem.getItemStack(), guiItem);
+        return this;
+    }
+
+    public Gui setItem(GuiItem guiItem, int slot) {
+        inventory.setItem(slot, guiItem.getItemStack());
+        actions.put(guiItem.getItemStack(), guiItem);
+        return this;
+    }
+
     public Gui setButton(GuiButton menuButton, int x, int y) {
         Pair<GuiButton, Pair<Integer, Integer>> temp = new Pair<>(menuButton, new Pair<>(x, y));
         buttons.add(temp);
@@ -85,7 +97,21 @@ public class Gui {
         contentSlot.forEach(i -> inventory.setItem(i, null));
     }
 
+    public void next(Player player) {
+        open(player, ++now);
+    }
+
+    public void back(Player player) {
+        open(player, --now);
+    }
+
+    /**
+     * open gui.
+     * @param player player
+     * @param page 1..max page
+     */
     public void open(Player player, int page) {
+        int max = (int) Math.ceil((double) (contents.size()-1)/size);
         now = page;
         clear();
         Inventory result = Bukkit.createInventory(null, rows*9, title.replace("%page%", String.valueOf(page)));
@@ -101,6 +127,29 @@ public class Gui {
             new ContentsList<>(inventory.getContents()).forEach((value, index) -> result.setItem(index, value.clone()));
             getContents(page).forEach((index, value) -> result.setItem(index, value.clone()));
         }
+        buttons.forEach(button -> {
+            GuiItem item;
+            switch (button.first()) {
+                case NEXT:
+                    if(page<max) {
+                        item = new GuiItem(GuiManager.next).addConsumer(event -> this.next((Player) event.getWhoClicked()));
+                    } else {
+                        item = new GuiItem(GuiManager.last);
+                    }
+                    break;
+                case BACK:
+                    if(page!=1) {
+                        item = new GuiItem(GuiManager.back).addConsumer(event -> this.back((Player) event.getWhoClicked()));
+                    } else {
+                        item = new GuiItem(GuiManager.first);
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + button.first());
+            }
+            result.setItem(button.second().second()*9+button.second().first(), item.getItemStack());
+            actions.put(item.getItemStack(), item);
+        });
         GuiManager.addGui(this, result, player);
         player.openInventory(result);
     }
@@ -111,8 +160,7 @@ public class Gui {
             GuiManager.addGui(this, inventory, player);
         } else {
             Inventory result = Bukkit.createInventory(null, rows*9, title);
-            result.setContents(inventory.getContents());
-            player.openInventory(result);
+            new ContentsList<>(inventory.getContents()).forEach((value, index) -> result.setItem(index, value.clone()));
             GuiManager.addGui(this, result, player);
         }
     }
