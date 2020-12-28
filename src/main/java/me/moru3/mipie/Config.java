@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-class Config {
+public class Config {
     private final Plugin plugin;
     private final String filename;
     private FileConfiguration config;
