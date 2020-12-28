@@ -8,18 +8,21 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuiManager implements Listener {
     public static final ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> actions = new ContentsMap<>();
-    public static final ContentsMap<UUID, ContentsList<Inventory>> guiList = new ContentsMap<>();
+    public static final ContentsMap<UUID, Gui> guiList = new ContentsMap<>();
     public static final ContentsMap<Player, Pair<UUID, Inventory>> playerGuiList = new ContentsMap<>();
+    public static final ContentsList<Player> notClose = new ContentsList<>();
 
     public static ItemStack next;
     public static ItemStack back;
@@ -28,19 +31,25 @@ public class GuiManager implements Listener {
 
     @EventHandler
     public void onClick(InventoryClickEvent event) {
-        if(actions.size()==0) { return; }
+        if(event.getView().getTopInventory()==null) { return; }
         Player player = (Player) event.getWhoClicked();
-        if(player==null) { return; }
-        GuiItem guiItem = actions.get(player).get(event.getCurrentItem());
-        if(guiItem==null) { return; }
-        if(!guiItem.isAllowGet()) { event.setCancelled(true); }
-        guiItem.runAction(event);
+        if(playerGuiList.get(player)==null) { return; }
+        Gui gui = guiList.get(playerGuiList.get(player).first());
+        if(actions.size()!=0&&actions.get(player).containsKey(event.getCurrentItem())) {
+            GuiItem guiItem = actions.get(player).get(event.getCurrentItem());
+            if(guiItem==null) { return; }
+            if(!guiItem.isAllowGet()) { event.setCancelled(true); }
+            guiItem.runAction(event);
+        }
     }
 
-    /**
-    EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
+        if(notClose.contains(player)) {
+            notClose.remove(player);
+            return;
+        }
         AtomicBoolean remove = new AtomicBoolean(true);
         if(playerGuiList.get(player)==null) { return; }
         UUID uuid = playerGuiList.get(player).first();
@@ -49,7 +58,6 @@ public class GuiManager implements Listener {
         if(remove.get()) { guiList.remove(uuid); }
         actions.remove(player);
     }
-    **/
 
     public GuiManager() {
         next = Util.generateItem(Material.ARROW, ChatColor.GREEN + "Next", Collections.singletonList(ChatColor.GRAY + "Go to the next page"));
@@ -59,12 +67,7 @@ public class GuiManager implements Listener {
     }
 
     public static void addGui(Gui gui, Inventory inventory, Player player) {
-        ContentsList<Inventory> temp = new ContentsList<>();
-        if(guiList.get(gui.getID())!=null) {
-            temp.addAll(guiList.get(gui.getID()));
-        }
-        temp.add(inventory);
-        guiList.put(gui.getID(), temp);
+        guiList.put(gui.getID(), gui);
         playerGuiList.put(player, new Pair<>(gui.getID(), inventory));
         ContentsMap<ItemStack, GuiItem> temp2 = new ContentsMap<>();
         gui.actions.forEach(temp2::put);

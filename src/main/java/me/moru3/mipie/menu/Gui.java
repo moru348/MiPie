@@ -34,6 +34,9 @@ public class Gui {
 
     Sound sound;
 
+    private boolean allowAddItem;
+    private boolean allowTakeItem;
+
     /**
      * This is when creating a page menu.
      * @param startX startX 0 - 8
@@ -62,7 +65,22 @@ public class Gui {
             contentSlot.add(nowSlot);
             nowSlot++;
         }
+        allowAddItem = false;
+        allowTakeItem = false;
     }
+
+    public Gui setAllowAddItem(boolean o) {
+        allowAddItem = o;
+        return this;
+    }
+
+    public Gui setAllowTakeItem(boolean o) {
+        allowTakeItem = o;
+        return this;
+    }
+
+    public boolean isAllowAddItem() { return allowAddItem; }
+    public boolean isAllowTakeItem() { return allowTakeItem; }
 
     public UUID getID() { return id; }
 
@@ -109,13 +127,18 @@ public class Gui {
     public void back(Player player) {
         open(player, --now);
     }
-
     /**
      * open gui.
      * @param player player
      * @param page 1..max page
      */
     public void open(Player player, int page) {
+        if(sync&&GuiManager.guiList.containsKey(id)&&(GuiManager.playerGuiList.get(player)==null||GuiManager.playerGuiList.get(player).first()!=id)) {
+            if(GuiManager.playerGuiList.get(player)!=null) { GuiManager.notClose.add(player); }
+            player.openInventory(inventory);
+            GuiManager.addGui(this, inventory, player);
+            return;
+        }
         int max = (int) Math.ceil((double) (contents.size()-1)/size);
         now = page;
         clear();
@@ -123,11 +146,11 @@ public class Gui {
         if(sync) {
             result.setContents(inventory.getContents());
             getContents(page).forEach(result::setItem);
-            GuiManager.playerGuiList.forEach((plyr, gui) -> {
-                GuiManager.addGui(this, result, plyr);
-                plyr.openInventory(result);
-            });
             inventory = result;
+            GuiManager.playerGuiList.getKeys().forEach((player1 -> {
+                GuiManager.notClose.add(player1);
+                player1.openInventory(result);
+            }));
         } else {
             new ContentsList<>(inventory.getContents()).forEach((value, index) -> {
                 if(value==null) { return; }
@@ -163,11 +186,14 @@ public class Gui {
             actions.put(item.getItemStack(), item);
         });
         GuiManager.addGui(this, result, player);
+        if(GuiManager.playerGuiList.get(player)!=null) { GuiManager.notClose.add(player); }
         player.openInventory(result);
     }
 
     public void open(Player player) {
+        if(GuiManager.playerGuiList.get(player)!=null) { GuiManager.notClose.add(player); }
         if(sync) {
+
             player.openInventory(inventory);
             GuiManager.addGui(this, inventory, player);
         } else {
