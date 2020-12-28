@@ -68,6 +68,11 @@ public class Gui {
 
     public Gui addContents(GuiItem guiItem) {
         contents.add(guiItem.getItemStack());
+        actions.put(guiItem.getItemStack(), guiItem);
+        return this;
+    }
+    public Gui addContents(ItemStack itemStack) {
+        contents.add(itemStack);
         return this;
     }
 
@@ -119,14 +124,21 @@ public class Gui {
             result.setContents(inventory.getContents());
             getContents(page).forEach(result::setItem);
             GuiManager.playerGuiList.forEach((plyr, gui) -> {
-                GuiManager.playerGuiList.remove(plyr);
+                GuiManager.addGui(this, result, plyr);
                 plyr.openInventory(result);
             });
             inventory = result;
         } else {
-            new ContentsList<>(inventory.getContents()).forEach((value, index) -> result.setItem(index, value.clone()));
-            getContents(page).forEach((index, value) -> result.setItem(index, value.clone()));
+            new ContentsList<>(inventory.getContents()).forEach((value, index) -> {
+                if(value==null) { return; }
+                result.setItem(index, value.clone());
+            });
+            getContents(page).forEach((index, value) -> {
+                if(value==null) { return; }
+                result.setItem(index, value.clone());
+            });
         }
+        GuiManager.actions.remove(player);
         buttons.forEach(button -> {
             GuiItem item;
             switch (button.first()) {
@@ -160,7 +172,10 @@ public class Gui {
             GuiManager.addGui(this, inventory, player);
         } else {
             Inventory result = Bukkit.createInventory(null, rows*9, title);
-            new ContentsList<>(inventory.getContents()).forEach((value, index) -> result.setItem(index, value.clone()));
+            new ContentsList<>(inventory.getContents()).forEach((value, index) -> {
+                if(value==null) { return; }
+                result.setItem(index, value.clone());
+            });
             GuiManager.addGui(this, result, player);
         }
     }

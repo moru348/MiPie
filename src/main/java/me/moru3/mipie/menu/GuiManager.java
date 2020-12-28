@@ -10,16 +10,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GuiManager implements Listener {
-    private static final ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> actions = new ContentsMap<>();
+    public static final ContentsMap<Player, ContentsMap<ItemStack, GuiItem>> actions = new ContentsMap<>();
     public static final ContentsMap<UUID, ContentsList<Inventory>> guiList = new ContentsMap<>();
     public static final ContentsMap<Player, Pair<UUID, Inventory>> playerGuiList = new ContentsMap<>();
 
@@ -35,20 +33,23 @@ public class GuiManager implements Listener {
         if(player==null) { return; }
         GuiItem guiItem = actions.get(player).get(event.getCurrentItem());
         if(guiItem==null) { return; }
-        if(guiItem.isAllowGet()) { event.setCancelled(true); }
+        if(!guiItem.isAllowGet()) { event.setCancelled(true); }
         guiItem.runAction(event);
     }
 
-    @EventHandler
+    /**
+    EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
         Player player = (Player) event.getPlayer();
         AtomicBoolean remove = new AtomicBoolean(true);
+        if(playerGuiList.get(player)==null) { return; }
         UUID uuid = playerGuiList.get(player).first();
         playerGuiList.remove(player);
         playerGuiList.forEach((plyr, pair) -> { if(pair.first()==uuid) { remove.set(false); } });
         if(remove.get()) { guiList.remove(uuid); }
         actions.remove(player);
     }
+    **/
 
     public GuiManager() {
         next = Util.generateItem(Material.ARROW, ChatColor.GREEN + "Next", Collections.singletonList(ChatColor.GRAY + "Go to the next page"));
@@ -59,7 +60,9 @@ public class GuiManager implements Listener {
 
     public static void addGui(Gui gui, Inventory inventory, Player player) {
         ContentsList<Inventory> temp = new ContentsList<>();
-        temp.addAll(guiList.get(gui.getID()));
+        if(guiList.get(gui.getID())!=null) {
+            temp.addAll(guiList.get(gui.getID()));
+        }
         temp.add(inventory);
         guiList.put(gui.getID(), temp);
         playerGuiList.put(player, new Pair<>(gui.getID(), inventory));
