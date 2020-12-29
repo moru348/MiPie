@@ -37,6 +37,29 @@ public class Gui {
     private boolean allowAddItem;
     private boolean allowTakeItem;
 
+    public Gui(String title, int rows, boolean sync) {
+        id = UUID.randomUUID();
+        if(rows<endY) { throw new IllegalArgumentException("There are not enough rows."); }
+        this.startX = 0;
+        this.startY = 0;
+        this.endX = 8;
+        this.endY = rows;
+        this.size = (endY-startY)*(endX+1-startX)-1;
+        this.rows = rows;
+        this.inventory = Bukkit.createInventory(null, rows*9, title);
+        this.title = title;
+        int nowSlot = (startY*9) + startX;
+        int skip = startX+(8-endX);
+        this.sync = sync;
+        for(int i = 0;i< size+1;i++) {
+            if((((int) Math.ceil(nowSlot/9.0))-1)*9+endX+1==nowSlot) { nowSlot+=skip; }
+            contentSlot.add(nowSlot);
+            nowSlot++;
+        }
+        allowAddItem = false;
+        allowTakeItem = false;
+    }
+
     /**
      * This is when creating a page menu.
      * @param startX startX 0 - 8
