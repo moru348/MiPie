@@ -41,7 +41,6 @@ public class Selector {
                 return new ContentsList<>();
             }
             ForFunction<Integer, Integer, Integer, Integer, Boolean> coodRange = (Integer v, Integer v2, Integer player, Integer value) -> {
-                System.out.println(v + " : " + v2 + " : " + player + " : " + value);
                 if(v==Integer.MAX_VALUE&&v2==Integer.MAX_VALUE) {
                     return true;
                 } else if(v == Integer.MAX_VALUE) {
