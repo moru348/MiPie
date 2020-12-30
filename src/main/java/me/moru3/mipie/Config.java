@@ -1,14 +1,13 @@
 package me.moru3.mipie;
 
+import com.google.common.base.Charsets;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 
 public class Config {
     private final Plugin plugin;
@@ -28,12 +27,12 @@ public class Config {
 
     public void reloadConfig() {
         config = YamlConfiguration.loadConfiguration(configFile);
-        defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(filename), StandardCharsets.UTF_8));
+        defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(filename), Charsets.UTF_8));
         config.setDefaults(defaultConfig);
     }
 
     private void reloadDefaultConfig() {
-        defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(filename), StandardCharsets.UTF_8));
+        defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(plugin.getResource(filename), Charsets.UTF_8));
     }
 
     public FileConfiguration config() {

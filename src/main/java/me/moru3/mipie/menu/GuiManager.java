@@ -34,11 +34,16 @@ public class GuiManager implements Listener {
         if(event.getView().getTopInventory()==null) { return; }
         Player player = (Player) event.getWhoClicked();
         if(playerGuiList.get(player)==null) { return; }
-        Gui gui = guiList.get(playerGuiList.get(player).first());
+        // Gui gui = guiList.get(playerGuiList.get(player).first());
         if(actions.size()!=0&&actions.get(player).containsKey(event.getCurrentItem())) {
             GuiItem guiItem = actions.get(player).get(event.getCurrentItem());
             if(guiItem==null) { return; }
             if(!guiItem.isAllowGet()) { event.setCancelled(true); }
+            if(guiItem.listGui!=null) {
+                guiItem.listGui.open(player, guiItem.page);
+            } else if(guiItem.gui!=null) {
+                guiItem.gui.open(player);
+            }
             guiItem.runAction(event);
         }
     }

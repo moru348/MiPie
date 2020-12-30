@@ -19,6 +19,7 @@ public class Gui {
     int startY;
     int endX;
     int endY;
+    boolean list = true;
 
     ContentsList<ItemStack> contents = new ContentsList<>();
     ContentsList<Pair<GuiButton, Pair<Integer, Integer>>> buttons = new ContentsList<>();
@@ -58,6 +59,7 @@ public class Gui {
         }
         allowAddItem = false;
         allowTakeItem = false;
+        list = false;
     }
 
     /**
@@ -140,7 +142,9 @@ public class Gui {
     }
 
     public void clear() {
-        contentSlot.forEach(i -> inventory.setItem(i, null));
+        if(list) {
+            contentSlot.forEach(i -> inventory.setItem(i, null));
+        }
     }
 
     public void next(Player player) {
@@ -216,7 +220,6 @@ public class Gui {
     public void open(Player player) {
         if(GuiManager.playerGuiList.get(player)!=null) { GuiManager.notClose.add(player); }
         if(sync) {
-
             player.openInventory(inventory);
             GuiManager.addGui(this, inventory, player);
         } else {
@@ -226,6 +229,7 @@ public class Gui {
                 result.setItem(index, value.clone());
             });
             GuiManager.addGui(this, result, player);
+            player.openInventory(result);
         }
     }
 }
