@@ -126,12 +126,24 @@ public class Gui {
     public Gui setItem(GuiItem guiItem, int x, int y) {
         inventory.setItem(y*9+x, guiItem.getItemStack());
         actions.put(guiItem.getItemStack(), guiItem);
+        if(sync) {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                if(GuiManager.playerGuiList.get(player)==null) return;
+                if(GuiManager.playerGuiList.get(player).first()==id) { GuiManager.addGui(this, inventory, player); }
+            });
+        }
         return this;
     }
 
     public Gui setItem(GuiItem guiItem, int slot) {
         inventory.setItem(slot, guiItem.getItemStack());
         actions.put(guiItem.getItemStack(), guiItem);
+        if(sync) {
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                if(GuiManager.playerGuiList.get(player)==null) return;
+                if(GuiManager.playerGuiList.get(player).first()==id) { GuiManager.addGui(this, inventory, player); }
+            });
+        }
         return this;
     }
 

@@ -20,7 +20,7 @@ public class Language {
     }
 
     public String get(String key) {
-        return ChatColor.translateAlternateColorCodes('&', prefix+config.config().getString(key, config.defaultConfig().getString(key)));
+        return ChatColor.translateAlternateColorCodes('&', prefix+config.config().getString(key, config.defaultConfig().getString(key, "§cMessage not found")));
     }
 
     /**
@@ -31,12 +31,14 @@ public class Language {
      */
     public String get(String key, String... replace) {
         AtomicReference<String> msg = new AtomicReference<>(config.config().getString(key, config.defaultConfig().getString(key)));
+        if(msg.get()==null) { return "§cMessage not found"; }
         new ContentsList<>(replace).forEach((value, index) -> msg.updateAndGet(v -> v.replace("%" + (index+1), value)));
         return ChatColor.translateAlternateColorCodes('&', prefix+msg.get());
     }
 
     public String get(String key, Map<String, String> replace) {
         AtomicReference<String> msg = new AtomicReference<>(config.config().getString(key, config.defaultConfig().getString(key)));
+        if(msg.get()==null) { return "§cMessage not found"; }
         replace.forEach((k, v) -> msg.updateAndGet(i -> i.replace(k, v)));
         return ChatColor.translateAlternateColorCodes('&', prefix+msg.get());
     }
