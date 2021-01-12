@@ -26,9 +26,13 @@ public class Selector {
     Pattern SCORE_MAX = Pattern.compile("\\.\\.[0-9]+?");
     Pattern SCORE_MIN = Pattern.compile("[0-9]+?\\.\\.");
     Pattern SCORE_RANGE = Pattern.compile("[0-9]+?\\.\\.[0-9]+?");
+    Pattern SELECTER = Pattern.compile("@(a/r/p/s)\\[.+]");
 
     public List<Player> build(@NotNull String selector, @NotNull Player executer) {
         try {
+            if(SELECTER.matcher(selector).matches()) {
+                return new ContentsList<>();
+            }
             SelectorType type = null;
             for (SelectorType selectorType : SelectorType.values()) {
                 if (selector.startsWith(selectorType.toString())) {
