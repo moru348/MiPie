@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class InventoryManager {
-    public Boolean delItemInventory(Inventory inv, ItemStack item, int amo) {
+    public static Boolean delItemInventory(Inventory inv, ItemStack item, int amo) {
         item.setAmount(1);
         AtomicReference<Integer> amount = new AtomicReference<>(0);
         ContentsList<ItemStack> items = new ContentsList<>();
@@ -37,19 +37,19 @@ public class InventoryManager {
         return false;
     }
 
-    public Boolean hasItem(Inventory inv, ItemStack item, int amo) {
+    public static Boolean hasItem(Inventory inv, ItemStack item, int amo) {
         item.setAmount(1);
         AtomicReference<Integer> amount = new AtomicReference<>(0);
         Arrays.stream(inv.getContents()).filter(Objects::nonNull).forEach(invItem -> {
             ItemStack tempItem = invItem.clone();
-            invItem.setAmount(1);
+            tempItem.setAmount(1);
             if(tempItem!=item) { return; }
             amount.updateAndGet(v -> v + invItem.getAmount());
         });
         return amount.get() >= amo;
     }
 
-    public Boolean hasInventoryArea(Inventory inv, ItemStack item, int amo) {
+    public static Boolean hasInventoryArea(Inventory inv, ItemStack item, int amo) {
         item.setAmount(1);
         AtomicReference<Integer> amount = new AtomicReference<>(0);
         Arrays.stream(inv.getContents()).forEach(invItem -> {
@@ -67,7 +67,7 @@ public class InventoryManager {
         return amount.get() >= amo;
     }
 
-    public Boolean addItemInventory(Inventory inv, ItemStack item, int amo) {
+    public static Boolean addItemInventory(Inventory inv, ItemStack item, int amo) {
         item.setAmount(1);
         AtomicReference<Integer> amount = new AtomicReference<>(0);
         ContentsList<ItemStack> items = new ContentsList<>();
@@ -111,7 +111,7 @@ public class InventoryManager {
             }
         }
     }
-    public void dropItem(Location location, ItemStack item, int amo) {
+    public static void dropItem(Location location, ItemStack item, int amo) {
         while(true) {
             if(amo>item.getMaxStackSize()) {
                 item.setAmount(item.getMaxStackSize());

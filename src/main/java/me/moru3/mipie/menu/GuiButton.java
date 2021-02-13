@@ -1,4 +1,4 @@
-package me.moru3.mipie.Menu;
+package me.moru3.mipie.menu;
 
 public enum GuiButton {
     NEXT,

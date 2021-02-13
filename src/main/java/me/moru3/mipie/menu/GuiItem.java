@@ -1,4 +1,4 @@
-package me.moru3.mipie.Menu;
+package me.moru3.mipie.menu;
 
 import me.moru3.marstools.ContentsList;
 import org.bukkit.event.inventory.InventoryClickEvent;

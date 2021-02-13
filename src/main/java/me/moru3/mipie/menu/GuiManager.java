@@ -1,4 +1,4 @@
-package me.moru3.mipie.Menu;
+package me.moru3.mipie.menu;
 
 import me.moru3.marstools.ContentsList;
 import me.moru3.marstools.ContentsMap;
@@ -6,6 +6,7 @@ import me.moru3.marstools.Pair;
 import me.moru3.mipie.Util;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -29,6 +30,8 @@ public class GuiManager implements Listener {
     public static ItemStack last;
     public static ItemStack first;
 
+    public static Sound sound;
+
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         if(event.getView().getTopInventory()==null) { return; }
@@ -44,8 +47,22 @@ public class GuiManager implements Listener {
             } else if(guiItem.gui!=null) {
                 guiItem.gui.open(player);
             }
+            if(sound!=null&&!guiItem.consumers.isEmpty()) {
+                ((Player) event.getWhoClicked()).playSound(event.getWhoClicked().getLocation(), sound, 1F, 1F);
+            }
             guiItem.runAction(event);
         }
+    }
+
+    public void setClickSound(Sound s) {
+        sound = s;
+    }
+
+    public void setItems(ItemStack nextItem, ItemStack backItem, ItemStack firstItem, ItemStack lastItem) {
+        if(nextItem!=null) { next = nextItem; }
+        if(backItem!=null) { back = backItem; }
+        if(firstItem!=null) { first = firstItem; }
+        if(lastItem!=null) { last = lastItem; }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
